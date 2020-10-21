@@ -50,7 +50,6 @@ Write-Host "No new mail signature set"
 }
 elseif ($NewMsgSig){
 Copy-Item -Path "$SigSource\$NewMsgSig-files" -Destination "$PrimSigPath" -Recurse -Force -ErrorAction SilentlyContinue
-Copy-Item -Path "$SigSource\$NewMsgSig-filer" -Destination "$PrimSigPath" -Recurse -Force
 Copy-Item -Path "$SigSource\$NewMsgSig.*" -Destination "$PrimSigPath" -Force
 }
 
@@ -60,7 +59,6 @@ Write-Host "No reply signature set"
 }
 elseif ($ReplyMsgSig){
 Copy-Item -Path "$SigSource\$ReplyMsgSig-files" -Destination "$ReplySigPath" -Recurse -Force -ErrorAction SilentlyContinue
-Copy-Item -Path "$SigSource\$NewMsgSig-filer" -Destination "$PrimSigPath" -Recurse -Force
 Copy-Item -Path "$SigSource\$ReplyMsgSig.*" -Destination "$ReplySigPath" -Force 
 }
 
