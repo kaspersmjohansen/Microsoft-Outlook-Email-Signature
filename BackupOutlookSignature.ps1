@@ -49,7 +49,8 @@ if ($NewMsgSig -eq "(none)") {
 Write-Host "No new mail signature set"
 }
 elseif ($NewMsgSig){
-Copy-Item -Path "$SigSource\$NewMsgSig-files" -Destination "$PrimSigPath\$NewMsgSig-files" -Recurse -Force
+Copy-Item -Path "$SigSource\$NewMsgSig-files" -Destination "$PrimSigPath\$NewMsgSig-files" -Recurse -Force -ErrorAction SilentlyContinue
+Copy-Item -Path "$SigSource\$NewMsgSig_files" -Destination "$PrimSigPath\$NewMsgSig_files" -Recurse -Force -ErrorAction SilentlyContinue
 Copy-Item -Path "$SigSource\$NewMsgSig.*" -Destination "$PrimSigPath" -Force -Verbose
 }
 
@@ -58,7 +59,8 @@ if ($ReplyMsgSig -eq "(none)") {
 Write-Host "No reply signature set"
 }
 elseif ($ReplyMsgSig){
-Copy-Item -Path "$SigSource\$ReplyMsgSig-files" -Destination "$ReplySigPath\ReplyMsgSig-files" -Recurse -Force
+Copy-Item -Path "$SigSource\$ReplyMsgSig-files" -Destination "$ReplySigPath\ReplyMsgSig-files" -Recurse -Force -ErrorAction SilentlyContinue
+Copy-Item -Path "$SigSource\$ReplyMsgSig_files" -Destination "$ReplySigPath\ReplyMsgSig_files" -Recurse -Force -ErrorAction SilentlyContinue
 Copy-Item -Path "$SigSource\$ReplyMsgSig.*" -Destination "$ReplySigPath" -Force
 }
 
