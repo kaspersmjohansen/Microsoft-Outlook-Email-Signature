@@ -22,11 +22,12 @@ $PrimSigPath = "$BCKFolder\Outlook\PrimSig"
 $ReplySigPath = "$BCKFolder\Outlook\ReplySig"
 $OtherSigPath = "$BCKFolder\Outlook\Other"
 
-$PrimSig = Get-ChildItem "$PrimSigPath\*.*" | Foreach-Object {$_.BaseName} | Select-Object -Last 1
-$ReplySig = Get-ChildItem "$ReplySigPath\*.*" | Foreach-Object {$_.BaseName} | Select-Object -Last 1
+$PrimSig = Get-ChildItem "$PrimSigPath\*.*" | Foreach-Object {$_.BaseName} | Select-Object -Last 1 -ErrorAction SilentlyContinue
+$ReplySig = Get-ChildItem "$ReplySigPath\*.*" | Foreach-Object {$_.BaseName} | Select-Object -Last 1 -ErrorAction SilentlyContinue
 
-Copy-Item "$PrimSigPath\*" -Recurse "$SigSource"
-Copy-Item "$ReplySigPath\*" -Recurse "$SigSource"
+Copy-Item -Path "$PrimSigPath\*" -Destination "$SigSource" -Recurse -ErrorAction SilentlyContinue
+Copy-Item -Path "$ReplySigPath\*" -Destination "$SigSource" -Recurse -ErrorAction SilentlyContinue
+Copy-Item -Path "$OtherSigPath\*" -Destination "$SigSource" -Recurse -ErrorAction SilentlyContinue
 
 #Set Primary New messages 
 $MSWord = New-Object -com word.application 
