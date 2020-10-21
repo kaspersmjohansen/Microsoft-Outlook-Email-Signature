@@ -7,32 +7,9 @@
 # 
 # ******************************************************************************************
 
-$AppData = $env:AppData
-$Homedrive = $env:homedrive
-$Homepath = $env:homepath
-$Homedir = "$Homedrive$Homepath"
-$BCKFolder = ""
-$LogDir = ""
-$OfficeVersion =
-
-if ($OfficeVersion -eq 2013) {
-	$OfficeNumVer = "15.0"
-}
-elseif ($OfficeVersion -eq 2010) {
-	$OfficeNumVer = "14.0"
-}
-elseif ($OfficeVersion -eq 2007) {
-	$OfficeNumVer = "12.0"
-}
-
-$OfficeLang = (get-itemproperty -Path "HKCU:\Software\Microsoft\Office\$OfficeNumVer\Common\LanguageResources" -Name UILanguage).UILanguage
- 
-if ($OfficeLang -eq 1033) {
-	$SigSource = "$AppData\Microsoft\Signatures"
-}
-elseif ($OfficeLang -eq 1030) {
-	$SigSource = "$AppData\Microsoft\Signaturer"
-}
+$BCKFolder = "C:\Working"
+$LogDir = $BCKFolder
+$SigSource = "$env:AppData\Microsoft\Signatures"
 
 if (Get-Process outlook -ErrorAction silentlycontinue) {
 	Stop-Process -Name "Outlook" -ErrorAction silentlycontinue
@@ -57,36 +34,35 @@ $MSWord.Quit()
 #Create folder structure in backup location. The PrimSig folder contains the New Mail signature and the ReplySig folder contains the Reply Mail signature. 
 #Other signatures are copied to the Signatures folder in the backup location
 #A log file is also created
-If (!(Test-Path -Path "$BCKFolder\Outlook\Signatures")){
-New-Item -ItemType Directory -Force "$BCKFolder"
-New-Item -ItemType Directory -Force "$BCKFolder\PrimSig"
-New-Item -ItemType Directory -Force "$BCKFolder\ReplySig"
-New-Item -ItemType Directory -Force "$BCKFolder\Other"
+If (!(Test-Path -Path "$BCKFolder\Outlook")){
+New-Item -ItemType Directory -Force "$BCKFolder\Outlook"
+New-Item -ItemType Directory -Force "$BCKFolder\Outlook\PrimSig"
+New-Item -ItemType Directory -Force "$BCKFolder\Outlook\ReplySig"
+New-Item -ItemType Directory -Force "$BCKFolder\Outlook\Other"
 }
 
-if (($NewMsgSig -eq "(ingen)") -or ($NewMsgSig -eq "(none)")) {
+$PrimSigPath = "$BCKFolder\Outlook\PrimSig"
+$ReplySigPath = "$BCKFolder\Outlook\ReplySig"
+$OtherSigPath = "$BCKFolder\Outlook\Other"
+
+if ($NewMsgSig -eq "(none)") {
 Write-Host "No new mail signature set"
 }
-elseif (($NewMsgSig) -and ($OfficeUI -eq 1033)){
-Copy-Item "$SigSource\$NewMsgSig-files" "$BCKFolder\PrimSig\" -Recurse -Force -PassThru | Out-File -Append "$LogDir\SigLog.txt"
-Copy-Item "$SigSource\$NewMsgSig.*" "$BCKFolder\PrimSig\" -Force -PassThru | Out-File -Append "$LogDir\SigLog.txt"
-}
-elseif (($NewMsgSig) -and ($OfficeUI -eq 1030)){
-Copy-Item "$SigSource\$NewMsgSig-filer" "$BCKFolder\PrimSig\" -Recurse -Force -PassThru | Out-File -Append "$LogDir\SigLog.txt"
-Copy-Item "$SigSource\$NewMsgSig.*" "$BCKFolder\PrimSig\" -Force -PassThru | Out-File -Append "$LogDir\SigLog.txt"
+elseif ($NewMsgSig){
+Copy-Item -Path "$SigSource\$NewMsgSig-files" -Destination "$PrimSigPath" -Recurse -Force -ErrorAction SilentlyContinue
+Copy-Item -Path "$SigSource\$NewMsgSig-filer" -Destination "$PrimSigPath" -Recurse -Force
+Copy-Item -Path "$SigSource\$NewMsgSig.*" -Destination "$PrimSigPath" -Force
 }
 
-if (($ReplyMsgSig -eq "(ingen)") -or ($ReplyMsgSig -eq "(none)")) {
+
+if ($ReplyMsgSig -eq "(none)") {
 Write-Host "No reply signature set"
 }
-elseif (($ReplyMsgSig) -and ($OfficeUI -eq 1033)){
-Copy-Item "$SigSource\$ReplyMsgSig-files" "$BCKFolder\ReplySig\" -Recurse -Force -PassThru | Out-File -Append "$LogDir\SigLog.txt"
-Copy-Item "$SigSource\$ReplyMsgSig.*" "$BCKFolder\ReplySig\" -Force -PassThru | Out-File -Append "$LogDir\SigLog.txt"
-}
-elseif (($ReplyMsgSig) -and ($OfficeUI -eq 1030)){
-Copy-Item "$SigSource\$ReplyMsgSig-filer" "$BCKFolder\ReplySig\" -Recurse -Force -PassThru | Out-File -Append "$LogDir\SigLog.txt"
-Copy-Item "$SigSource\$ReplyMsgSig.*" "$BCKFolder\ReplySig\" -Force -PassThru | Out-File -Append "$LogDir\SigLog.txt"
+elseif ($ReplyMsgSig){
+Copy-Item -Path "$SigSource\$ReplyMsgSig-files" -Destination "$ReplySigPath" -Recurse -Force -ErrorAction SilentlyContinue
+Copy-Item -Path "$SigSource\$NewMsgSig-filer" -Destination "$PrimSigPath" -Recurse -Force
+Copy-Item -Path "$SigSource\$ReplyMsgSig.*" -Destination "$ReplySigPath" -Force 
 }
 
 $Exclude=@("$NewMsgSig.*","$NewMsgSig-Filer","$NewMsgSig-Files","$ReplyMsgSig.*","$ReplyMsgSig-filer","$ReplyMsgSig-files")
-Copy-Item "$SigSource\*" "$BCKFolder\Other\" -Recurse -Force -Exclude $Exclude -PassThru | Out-File -Append "$LogDir\SigLog.txt"
+Copy-Item -Path "$SigSource\*" -Destination $OtherSigPath -Recurse -Force -Exclude $Exclude
