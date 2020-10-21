@@ -49,8 +49,7 @@ if ($NewMsgSig -eq "(none)") {
 Write-Host "No new mail signature set"
 }
 elseif ($NewMsgSig){
-Copy-Item -Path "$SigSource\$NewMsgSig-files" -Destination "$PrimSigPath\$NewMsgSig-files" -Recurse -Force -ErrorAction SilentlyContinue
-Copy-Item -Path "$SigSource\$NewMsgSig-filer" -Destination "$PrimSigPath\$NewMsgSig-filer" -Recurse -Force
+Copy-Item -Path "$SigSource\$NewMsgSig-files" -Destination "$PrimSigPath\$NewMsgSig-files" -Recurse -Force
 Copy-Item -Path "$SigSource\$NewMsgSig.*" -Destination "$PrimSigPath" -Force -Verbose
 }
 
